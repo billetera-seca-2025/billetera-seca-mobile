@@ -51,8 +51,8 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onRegister })
         style={styles.container}
       >
         <View style={styles.content}>
-          <Text style={styles.title}>Bienvenido</Text>
-          <Text style={styles.subtitle}>Ingresa tus datos para continuar</Text>
+          <Text style={styles.title}>Login</Text>
+          <Text style={styles.subtitle}>Ingresa tus credenciales</Text>
 
           {error && <AlertMessage message={error} onClose={() => setError(null)} />}
 
@@ -63,6 +63,8 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onRegister })
                   <Ionicons name="mail-outline" size={24} color={theme.colors.textSecondary} />
                 </View>
                 <TextInput
+                  testID="login-email"
+                  accessibilityLabel="login-email"
                   style={styles.input}
                   placeholder="Email"
                   value={email}
@@ -79,6 +81,8 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onRegister })
                   <Ionicons name="lock-closed-outline" size={24} color={theme.colors.textSecondary} />
                 </View>
                 <TextInput
+                  testID="login-password"
+                  accessibilityLabel="login-password"
                   style={styles.input}
                   placeholder="Contraseña"
                   value={password}
@@ -89,6 +93,8 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onRegister })
               </View>
 
               <TouchableOpacity
+                testID="login-button"
+                accessibilityLabel="login-button"
                 style={[styles.button, loading && styles.buttonDisabled]}
                 onPress={handleLogin}
                 disabled={loading}
@@ -105,7 +111,12 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onRegister })
                 </LinearGradient>
               </TouchableOpacity>
 
-              <TouchableOpacity style={styles.registerButton} onPress={onRegister}>
+              <TouchableOpacity
+                testID="register-link"
+                accessibilityLabel="register-link"
+                style={styles.linkButton}
+                onPress={onRegister}
+              >
                 <Text style={styles.registerText}>
                   ¿No tienes cuenta? <Text style={styles.registerTextBold}>Regístrate</Text>
                 </Text>
@@ -182,7 +193,7 @@ const styles = StyleSheet.create({
     fontSize: theme.typography.sizes.md,
     fontWeight: theme.typography.weights.semibold,
   } as TextStyle,
-  registerButton: {
+  linkButton: {
     marginTop: theme.spacing.lg,
     alignItems: 'center',
   } as ViewStyle,

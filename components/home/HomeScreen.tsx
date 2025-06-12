@@ -51,7 +51,13 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
     <ScreenLayout>
       <View style={styles.container}>
         <View style={styles.header}>
-          <Text style={styles.appTitle}>BilleteraSeca</Text>
+          <Text 
+            testID="home-title"
+            accessibilityLabel="home-title"
+            style={styles.appTitle}
+          >
+            BilleteraSeca
+          </Text>
           <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
             <Ionicons name="log-out-outline" size={24} color={theme.colors.text} />
           </TouchableOpacity>

@@ -15,7 +15,12 @@ export const AlertMessage: React.FC<AlertMessageProps> = ({ message, onClose }) 
         <Ionicons name="alert-circle" size={24} color={theme.colors.error} />
         <Text style={styles.message}>{message}</Text>
       </View>
-      <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+      <TouchableOpacity
+        testID="error-message"
+        accessibilityLabel="error-message"
+        style={styles.closeButton}
+        onPress={onClose}
+      >
         <Ionicons name="close" size={24} color={theme.colors.text} />
       </TouchableOpacity>
     </View>

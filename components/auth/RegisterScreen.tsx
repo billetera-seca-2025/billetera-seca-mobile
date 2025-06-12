@@ -62,8 +62,8 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({ onRegister, onLo
         style={styles.container}
       >
         <View style={styles.content}>
-          <Text style={styles.title}>Crear cuenta</Text>
-          <Text style={styles.subtitle}>Ingresa tus datos para registrarte</Text>
+          <Text style={styles.title}>Registro</Text>
+          <Text style={styles.subtitle}>Crea tu cuenta</Text>
 
           {error && <AlertMessage message={error} onClose={() => setError(null)} />}
 
@@ -74,6 +74,8 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({ onRegister, onLo
                   <Ionicons name="mail-outline" size={24} color={theme.colors.textSecondary} />
                 </View>
                 <TextInput
+                  testID="register-email"
+                  accessibilityLabel="register-email"
                   style={styles.input}
                   placeholder="Email"
                   value={email}
@@ -90,6 +92,8 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({ onRegister, onLo
                   <Ionicons name="lock-closed-outline" size={24} color={theme.colors.textSecondary} />
                 </View>
                 <TextInput
+                  testID="register-password"
+                  accessibilityLabel="register-password"
                   style={styles.input}
                   placeholder="Contraseña"
                   value={password}
@@ -104,6 +108,8 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({ onRegister, onLo
                   <Ionicons name="lock-closed-outline" size={24} color={theme.colors.textSecondary} />
                 </View>
                 <TextInput
+                  testID="register-confirm-password"
+                  accessibilityLabel="register-confirm-password"
                   style={styles.input}
                   placeholder="Confirmar contraseña"
                   value={confirmPassword}
@@ -114,6 +120,8 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({ onRegister, onLo
               </View>
 
               <TouchableOpacity
+                testID="register-button"
+                accessibilityLabel="register-button"
                 style={[styles.button, loading && styles.buttonDisabled]}
                 onPress={handleRegister}
                 disabled={loading}
@@ -130,7 +138,12 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({ onRegister, onLo
                 </LinearGradient>
               </TouchableOpacity>
 
-              <TouchableOpacity style={styles.loginButton} onPress={onLogin}>
+              <TouchableOpacity
+                testID="login-link"
+                accessibilityLabel="login-link"
+                style={styles.linkButton}
+                onPress={onLogin}
+              >
                 <Text style={styles.loginText}>
                   ¿Ya tienes cuenta? <Text style={styles.loginTextBold}>Inicia sesión</Text>
                 </Text>
@@ -207,7 +220,7 @@ const styles = StyleSheet.create({
     fontSize: theme.typography.sizes.md,
     fontWeight: theme.typography.weights.semibold,
   } as TextStyle,
-  loginButton: {
+  linkButton: {
     marginTop: theme.spacing.lg,
     alignItems: 'center',
   } as ViewStyle,
