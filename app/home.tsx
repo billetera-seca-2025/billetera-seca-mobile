@@ -12,9 +12,6 @@ export default function Home() {
       onAddMoney={() => {
         router.push('/addMoney');
       }}
-      onDebin={() => {
-        // TODO: Implementar
-      }}
       onTransactions={() => {
         // TODO: Implementar
       }}

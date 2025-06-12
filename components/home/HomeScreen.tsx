@@ -9,7 +9,6 @@ import { ScreenLayout } from '../common/ScreenLayout';
 interface HomeScreenProps {
   onTransfer: () => void;
   onAddMoney: () => void;
-  onDebin: () => void;
   onTransactions: () => void;
   onLogout: () => void;
 }
@@ -17,7 +16,6 @@ interface HomeScreenProps {
 export const HomeScreen: React.FC<HomeScreenProps> = ({
   onTransfer,
   onAddMoney,
-  onDebin,
   onTransactions,
   onLogout,
 }) => {
@@ -78,47 +76,36 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
         <View style={styles.actionsSection}>
           <Text style={styles.actionsTitle}>Acciones rápidas</Text>
           <View style={styles.actionsGrid}>
-            <TouchableOpacity
-              style={styles.actionButton}
-              onPress={onTransfer}
-            >
-              <LinearGradient
-                colors={[theme.colors.primary, theme.colors.primaryDark]}
-                style={styles.actionGradient}
+            <View style={styles.topRow}>
+              <TouchableOpacity
+                style={styles.actionButton}
+                onPress={onTransfer}
               >
-                <Ionicons name="swap-horizontal-outline" size={24} color={theme.colors.white} />
-                <Text style={styles.actionText}>Transferir</Text>
-              </LinearGradient>
-            </TouchableOpacity>
+                <LinearGradient
+                  colors={[theme.colors.primary, theme.colors.primaryDark]}
+                  style={styles.actionGradient}
+                >
+                  <Ionicons name="swap-horizontal-outline" size={24} color={theme.colors.white} />
+                  <Text style={styles.actionText}>Transferir</Text>
+                </LinearGradient>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.actionButton}
+                onPress={onAddMoney}
+              >
+                <LinearGradient
+                  colors={[theme.colors.success, theme.colors.successDark]}
+                  style={styles.actionGradient}
+                >
+                  <Ionicons name="add-circle-outline" size={24} color={theme.colors.white} />
+                  <Text style={styles.actionText}>Cargar</Text>
+                </LinearGradient>
+              </TouchableOpacity>
+            </View>
 
             <TouchableOpacity
-              style={styles.actionButton}
-              onPress={onAddMoney}
-            >
-              <LinearGradient
-                colors={[theme.colors.success, theme.colors.successDark]}
-                style={styles.actionGradient}
-              >
-                <Ionicons name="add-circle-outline" size={24} color={theme.colors.white} />
-                <Text style={styles.actionText}>Cargar</Text>
-              </LinearGradient>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.actionButton}
-              onPress={onDebin}
-            >
-              <LinearGradient
-                colors={[theme.colors.warning, theme.colors.warningDark]}
-                style={styles.actionGradient}
-              >
-                <Ionicons name="card-outline" size={24} color={theme.colors.white} />
-                <Text style={styles.actionText}>DEBIN</Text>
-              </LinearGradient>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.actionButton}
+              style={styles.fullWidthButton}
               onPress={onTransactions}
             >
               <LinearGradient
@@ -191,14 +178,27 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   actionsGrid: {
+    gap: 12,
+  },
+  topRow: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
     justifyContent: 'space-between',
+    gap: 12,
   },
   actionButton: {
-    width: '48%',
-    height: 80,
-    marginBottom: 16,
+    flex: 1,
+    height: 100,
+    borderRadius: 12,
+    overflow: 'hidden',
+    elevation: 2,
+    shadowColor: theme.colors.shadow,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+  },
+  fullWidthButton: {
+    width: '100%',
+    height: 100,
     borderRadius: 12,
     overflow: 'hidden',
     elevation: 2,
