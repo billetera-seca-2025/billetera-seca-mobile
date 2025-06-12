@@ -50,8 +50,7 @@ export interface TransferRequest {
 }
 
 export interface InstantDebitRequest {
-  payerEmail: string;
-  collectorEmail: string;
+  receiverEmail: string;
   amount: number;
   bankName: string;
   cbu: string;

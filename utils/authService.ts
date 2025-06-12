@@ -78,14 +78,17 @@ class AuthService {
     }
   }
 
-  async addMoney(amount: number): Promise<boolean> {
+  async addMoney(amount: number, bankName: string, cbu: string): Promise<boolean> {
     if (!this.currentUser) return false;
-    
     try {
-      // En la API real, esto sería una llamada a un endpoint específico
-      // Por ahora, simulamos que el balance se actualiza
-      const currentBalance = await this.getBalance();
-      this.currentUser.balance = currentBalance + amount;
+      const request: InstantDebitRequest = {
+        receiverEmail: this.currentUser.email,
+        amount,
+        bankName,
+        cbu,
+      };
+      await apiService.requestInstantDebit(request);
+
       return true;
     } catch (error) {
       console.error('Error al agregar dinero:', error);

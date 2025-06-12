@@ -10,7 +10,7 @@ export default function Home() {
         router.push('/transfer');
       }}
       onAddMoney={() => {
-        // TODO: Implementar
+        router.push('/addMoney');
       }}
       onDebin={() => {
         // TODO: Implementar

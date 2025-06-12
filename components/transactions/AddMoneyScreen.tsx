@@ -1,159 +1,223 @@
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useState } from 'react';
-import {
-    Alert,
-    KeyboardAvoidingView,
-    Platform,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
-} from 'react-native';
+import { KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, TextStyle, TouchableOpacity, View, ViewStyle } from 'react-native';
 import { theme } from '../../constants/theme';
 import { authService } from '../../utils/authService';
+import { AlertMessage } from '../common/AlertMessage';
+import { FormContainer } from '../common/FormContainer';
+import { ScreenLayout } from '../common/ScreenLayout';
+import { SuccessModal } from '../common/SuccessModal';
 
 interface AddMoneyScreenProps {
-  onBack: () => void;
+  onSuccess: () => void;
+  onCancel: () => void;
 }
 
-export const AddMoneyScreen: React.FC<AddMoneyScreenProps> = ({ onBack }) => {
+export const AddMoneyScreen: React.FC<AddMoneyScreenProps> = ({ onSuccess, onCancel }) => {
   const [amount, setAmount] = useState('');
+  const [bankName, setBankName] = useState('');
+  const [cbu, setCbu] = useState('');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   const handleAddMoney = async () => {
-    if (!amount) {
-      Alert.alert('Error', 'Por favor ingresa un monto');
+    if (!amount || !bankName || !cbu) {
+      setError('Por favor completa todos los campos');
       return;
     }
 
     const amountNumber = parseFloat(amount);
     if (isNaN(amountNumber) || amountNumber <= 0) {
-      Alert.alert('Error', 'El monto debe ser un número positivo');
+      setError('El monto debe ser un número positivo');
+      return;
+    }
+
+    if (cbu.length !== 22) {
+      setError('El CBU debe tener 22 dígitos');
       return;
     }
 
     setLoading(true);
-    try {
-      await authService.addMoney(amountNumber);
-      Alert.alert('Éxito', 'Dinero cargado con éxito', [
-        { text: 'OK', onPress: onBack },
-      ]);
-    } catch (error) {
-      Alert.alert('Error', 'No se pudo cargar el dinero');
-    } finally {
-      setLoading(false);
-    }
+    await authService.addMoney(amountNumber, bankName, cbu)
+      .then((success) => {
+        if (success) {
+          setShowSuccessModal(true);
+        } else {
+          setError('No se pudo cargar el dinero');
+        }
+      })
+      .catch((error) => {
+        setError('No se pudo cargar el dinero');
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   };
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <LinearGradient
-          colors={[theme.colors.success, theme.colors.successDark]}
-          style={styles.header}
-        >
-          <TouchableOpacity onPress={onBack} style={styles.backButton}>
-            <Ionicons name="arrow-back" size={24} color={theme.colors.white} />
+    <ScreenLayout>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.container}
+      >
+        <View style={styles.content}>
+          <TouchableOpacity style={styles.backButton} onPress={onCancel}>
+            <Ionicons name="arrow-back" size={24} color={theme.colors.text} />
           </TouchableOpacity>
+
           <Text style={styles.title}>Cargar Dinero</Text>
-        </LinearGradient>
+          <Text style={styles.subtitle}>Ingresa los datos de la transferencia</Text>
 
-        <View style={styles.formContainer}>
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Monto a Cargar</Text>
-            <TextInput
-              style={styles.input}
-              value={amount}
-              onChangeText={setAmount}
-              placeholder="0.00"
-              keyboardType="decimal-pad"
-            />
-          </View>
+          {error && <AlertMessage message={error} onClose={() => setError(null)} />}
 
-          <TouchableOpacity
-            style={styles.addButton}
-            onPress={handleAddMoney}
-            disabled={loading}
-          >
-            <LinearGradient
-              colors={[theme.colors.success, theme.colors.successDark]}
-              style={styles.addGradient}
-            >
-              <Text style={styles.addButtonText}>
-                {loading ? 'Cargando...' : 'Cargar Dinero'}
-              </Text>
-            </LinearGradient>
-          </TouchableOpacity>
+          <FormContainer>
+            <View style={styles.form}>
+              <View style={styles.inputContainer}>
+                <View style={styles.inputIconContainer}>
+                  <Ionicons name="cash-outline" size={24} color={theme.colors.textSecondary} />
+                </View>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Monto"
+                  value={amount}
+                  onChangeText={setAmount}
+                  keyboardType="numeric"
+                  placeholderTextColor={theme.colors.textSecondary}
+                />
+              </View>
+
+              <View style={styles.inputContainer}>
+                <View style={styles.inputIconContainer}>
+                  <Ionicons name="business-outline" size={24} color={theme.colors.textSecondary} />
+                </View>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Nombre del banco"
+                  value={bankName}
+                  onChangeText={setBankName}
+                  placeholderTextColor={theme.colors.textSecondary}
+                />
+              </View>
+
+              <View style={styles.inputContainer}>
+                <View style={styles.inputIconContainer}>
+                  <Ionicons name="card-outline" size={24} color={theme.colors.textSecondary} />
+                </View>
+                <TextInput
+                  style={styles.input}
+                  placeholder="CBU (22 dígitos)"
+                  value={cbu}
+                  onChangeText={setCbu}
+                  keyboardType="numeric"
+                  maxLength={22}
+                  placeholderTextColor={theme.colors.textSecondary}
+                />
+              </View>
+
+              <TouchableOpacity
+                style={[styles.button, loading && styles.buttonDisabled]}
+                onPress={handleAddMoney}
+                disabled={loading}
+              >
+                <LinearGradient
+                  colors={[theme.colors.success, theme.colors.successDark]}
+                  style={styles.buttonGradient}
+                  start={{ x: 0, y: 0.5 }}
+                  end={{ x: 0, y: 1 }}
+                >
+                  <Text style={styles.buttonText}>
+                    {loading ? 'Cargando...' : 'Cargar Dinero'}
+                  </Text>
+                </LinearGradient>
+              </TouchableOpacity>
+            </View>
+          </FormContainer>
         </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+      </KeyboardAvoidingView>
+
+      <SuccessModal
+        visible={showSuccessModal}
+        onClose={() => {
+          setShowSuccessModal(false);
+          onSuccess();
+        }}
+        title="¡Carga exitosa!"
+        message="El dinero se ha cargado correctamente"
+      />
+    </ScreenLayout>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: theme.colors.background,
-  },
-  scrollContent: {
-    flexGrow: 1,
-  },
-  header: {
-    padding: 20,
-    paddingTop: 40,
-    borderBottomLeftRadius: 30,
-    borderBottomRightRadius: 30,
-  },
+  } as ViewStyle,
+  content: {
+    flex: 1,
+    padding: theme.spacing.lg,
+    justifyContent: 'center',
+  } as ViewStyle,
   backButton: {
-    marginBottom: 20,
-  },
+    position: 'absolute',
+    top: theme.spacing.xl,
+    left: theme.spacing.lg,
+    zIndex: 1,
+  } as ViewStyle,
   title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: theme.colors.white,
-  },
-  formContainer: {
-    padding: 20,
-  },
-  inputContainer: {
-    marginBottom: 20,
-  },
-  label: {
-    fontSize: 16,
+    fontSize: theme.typography.sizes.xxl,
+    fontWeight: theme.typography.weights.bold,
     color: theme.colors.text,
-    marginBottom: 8,
-  },
-  input: {
-    backgroundColor: theme.colors.surface,
-    borderRadius: 12,
-    padding: 16,
-    fontSize: 16,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-  },
-  addButton: {
-    marginTop: 20,
-    borderRadius: 12,
-    overflow: 'hidden',
-    elevation: 5,
-    shadowColor: theme.colors.shadow,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-  },
-  addGradient: {
-    padding: 16,
+    marginBottom: theme.spacing.xs,
+    textAlign: 'center',
+  } as TextStyle,
+  subtitle: {
+    fontSize: theme.typography.sizes.md,
+    color: theme.colors.textSecondary,
+    marginBottom: theme.spacing.xl,
+    textAlign: 'center',
+  } as TextStyle,
+  form: {
+    width: '100%',
+  } as ViewStyle,
+  inputContainer: {
+    marginBottom: theme.spacing.md,
+    flexDirection: 'row',
     alignItems: 'center',
-  },
-  addButtonText: {
-    color: theme.colors.white,
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
+    backgroundColor: theme.colors.surfaceLight,
+    borderRadius: theme.borderRadius.lg,
+    padding: theme.spacing.sm,
+    ...theme.shadows.small,
+  } as ViewStyle,
+  inputIconContainer: {
+    width: 40,
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+  } as ViewStyle,
+  input: {
+    flex: 1,
+    padding: theme.spacing.md,
+    fontSize: theme.typography.sizes.md,
+    color: theme.colors.text,
+  } as TextStyle,
+  button: {
+    borderRadius: theme.borderRadius.lg,
+    overflow: 'hidden',
+    marginTop: theme.spacing.xl,
+    ...theme.shadows.medium,
+  } as ViewStyle,
+  buttonGradient: {
+    padding: theme.spacing.md,
+    alignItems: 'center',
+  } as ViewStyle,
+  buttonDisabled: {
+    opacity: 0.7,
+  } as ViewStyle,
+  buttonText: {
+    color: theme.colors.surface,
+    fontSize: theme.typography.sizes.md,
+    fontWeight: theme.typography.weights.semibold,
+  } as TextStyle,
 }); 
