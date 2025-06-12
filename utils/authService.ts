@@ -96,25 +96,6 @@ class AuthService {
     }
   }
 
-  async requestDebin(amount: number, payerEmail: string, bankName: string, cbu: string): Promise<boolean> {
-    if (!this.currentUser) return false;
-    
-    try {
-      const request: InstantDebitRequest = {
-        payerEmail,
-        collectorEmail: this.currentUser.email,
-        amount,
-        bankName,
-        cbu,
-      };
-      await apiService.requestInstantDebit(request);
-      return true;
-    } catch (error) {
-      console.error('Error en DEBIN:', error);
-      return false;
-    }
-  }
-
   async getTransactions(): Promise<TransactionDTO[]> {
     if (!this.currentUser) return [];
     try {

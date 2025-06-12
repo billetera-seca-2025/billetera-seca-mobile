@@ -57,7 +57,6 @@ export interface InstantDebitRequest {
 }
 
 export interface TransactionDTO {
-  id: string;
   type: 'INCOME' | 'OUTCOME';
   amount: number;
   createdAt: string;

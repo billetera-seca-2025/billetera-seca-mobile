@@ -11,6 +11,7 @@ export default function Layout() {
         <Stack.Screen name="home" />
         <Stack.Screen name="transfer" />
         <Stack.Screen name="addMoney" />
+        <Stack.Screen name="transactions" />
       </Stack>
     </GestureHandlerRootView>
   );

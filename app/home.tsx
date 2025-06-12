@@ -13,7 +13,7 @@ export default function Home() {
         router.push('/addMoney');
       }}
       onTransactions={() => {
-        // TODO: Implementar
+        router.push('/transactions');
       }}
       onLogout={() => {
         router.replace('/');

@@ -1,16 +1,16 @@
 import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
 import React, { useEffect, useState } from 'react';
 import { Alert, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { theme } from '../../constants/theme';
 import { TransactionDTO } from '../../utils/apiService';
 import { authService } from '../../utils/authService';
+import { ScreenLayout } from '../common/ScreenLayout';
 
 interface TransactionsScreenProps {
-  onBack: () => void;
+  onCancel: () => void;
 }
 
-export const TransactionsScreen: React.FC<TransactionsScreenProps> = ({ onBack }) => {
+export const TransactionsScreen: React.FC<TransactionsScreenProps> = ({ onCancel }) => {
   const [transactions, setTransactions] = useState<TransactionDTO[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -29,23 +29,56 @@ export const TransactionsScreen: React.FC<TransactionsScreenProps> = ({ onBack }
     }
   };
 
+  const getTransactionIcon = (type: string) => {
+    switch (type) {
+      case 'INCOME':
+        return 'arrow-down-circle';
+      case 'OUTCOME':
+        return 'arrow-up-circle';
+      default:
+        return 'swap-horizontal';
+    }
+  };
+
+  const getTransactionColor = (type: string) => {
+    switch (type) {
+      case 'INCOME':
+        return theme.colors.success;
+      case 'OUTCOME':
+        return theme.colors.error;
+      default:
+        return theme.colors.primary;
+    }
+  };
+
   const renderTransaction = ({ item }: { item: TransactionDTO }) => (
     <View style={styles.transactionItem}>
+      <View style={styles.transactionIconContainer}>
+        <Ionicons 
+          name={getTransactionIcon(item.type)} 
+          size={32} 
+          color={getTransactionColor(item.type)} 
+        />
+      </View>
       <View style={styles.transactionInfo}>
         <Text style={styles.transactionType}>
           {item.type === 'INCOME' ? 'Ingreso' : 'Egreso'}
         </Text>
         <Text style={styles.transactionDate}>
-          {new Date(item.createdAt).toLocaleDateString('es-AR')}
+          {new Date(item.createdAt).toLocaleDateString('es-AR', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+          })}
         </Text>
-        {item.relatedBankName && (
-          <Text style={styles.transactionBank}>{item.relatedBankName}</Text>
-        )}
+        <Text style={styles.transactionBank}>{item.relatedBankName || 'Transferencia'}</Text>
       </View>
       <Text
         style={[
           styles.transactionAmount,
-          { color: item.type === 'INCOME' ? theme.colors.success : theme.colors.error },
+          { color: getTransactionColor(item.type) },
         ]}
       >
         {item.type === 'INCOME' ? '+' : '-'}${item.amount.toLocaleString('es-AR')}
@@ -54,94 +87,99 @@ export const TransactionsScreen: React.FC<TransactionsScreenProps> = ({ onBack }
   );
 
   return (
-    <View style={styles.container}>
-      <LinearGradient
-        colors={[theme.colors.info, theme.colors.infoDark]}
-        style={styles.header}
-      >
-        <TouchableOpacity onPress={onBack} style={styles.backButton}>
-          <Ionicons name="arrow-back" size={24} color={theme.colors.white} />
+    <ScreenLayout>
+      <View style={styles.container}>
+        <TouchableOpacity style={styles.backButton} onPress={onCancel}>
+          <Ionicons name="arrow-back" size={24} color={theme.colors.text} />
         </TouchableOpacity>
-        <Text style={styles.title}>Transacciones</Text>
-      </LinearGradient>
 
-      {loading ? (
-        <View style={styles.loadingContainer}>
-          <Text style={styles.loadingText}>Cargando transacciones...</Text>
-        </View>
-      ) : transactions.length === 0 ? (
-        <View style={styles.emptyContainer}>
-          <Text style={styles.emptyText}>No hay transacciones para mostrar</Text>
-        </View>
-      ) : (
-        <FlatList
-          data={transactions}
-          renderItem={renderTransaction}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={styles.listContainer}
-        />
-      )}
-    </View>
+        <Text style={styles.title}>Transacciones</Text>
+        <Text style={styles.subtitle}>Historial de movimientos</Text>
+
+        {loading ? (
+          <View style={styles.loadingContainer}>
+            <Text style={styles.loadingText}>Cargando transacciones...</Text>
+          </View>
+        ) : transactions.length === 0 ? (
+          <View style={styles.emptyContainer}>
+            <Ionicons name="receipt-outline" size={48} color={theme.colors.textSecondary} />
+            <Text style={styles.emptyText}>No hay transacciones para mostrar</Text>
+          </View>
+        ) : (
+          <FlatList
+            data={transactions}
+            renderItem={renderTransaction}
+            keyExtractor={(item, index) => index.toString()}
+            contentContainerStyle={styles.listContainer}
+            showsVerticalScrollIndicator={false}
+          />
+        )}
+      </View>
+    </ScreenLayout>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: theme.colors.background,
-  },
-  header: {
-    padding: 20,
-    paddingTop: 40,
-    borderBottomLeftRadius: 30,
-    borderBottomRightRadius: 30,
+    padding: theme.spacing.lg,
   },
   backButton: {
-    marginBottom: 20,
+    marginBottom: theme.spacing.xl,
   },
   title: {
-    fontSize: 24,
+    fontSize: theme.typography.sizes.xxl,
     fontWeight: 'bold',
-    color: theme.colors.white,
+    color: theme.colors.text,
+    marginBottom: theme.spacing.xs,
+  },
+  subtitle: {
+    fontSize: theme.typography.sizes.md,
+    color: theme.colors.textSecondary,
+    marginBottom: theme.spacing.xl,
   },
   listContainer: {
-    padding: 20,
+    paddingVertical: theme.spacing.sm,
+    marginHorizontal: theme.spacing.xs,
   },
   transactionItem: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 15,
+    padding: theme.spacing.md,
     backgroundColor: theme.colors.surface,
-    borderRadius: 12,
-    marginBottom: 10,
-    elevation: 2,
-    shadowColor: theme.colors.shadow,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 2,
+    borderRadius: theme.borderRadius.lg,
+    marginBottom: theme.spacing.sm,
+    ...theme.shadows.small,
+  },
+  transactionIconContainer: {
+    width: 48,
+    height: 48,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: theme.spacing.md,
   },
   transactionInfo: {
     flex: 1,
   },
   transactionType: {
-    fontSize: 16,
-    fontWeight: 'bold',
+    fontSize: theme.typography.sizes.md,
+    fontWeight: '600',
     color: theme.colors.text,
-    marginBottom: 4,
+    marginBottom: theme.spacing.xs,
   },
   transactionDate: {
-    fontSize: 14,
+    fontSize: theme.typography.sizes.sm,
     color: theme.colors.textSecondary,
-    marginBottom: 2,
+    marginBottom: theme.spacing.xs,
   },
   transactionBank: {
-    fontSize: 14,
+    fontSize: theme.typography.sizes.sm,
     color: theme.colors.textSecondary,
   },
   transactionAmount: {
-    fontSize: 16,
+    fontSize: theme.typography.sizes.md,
     fontWeight: 'bold',
+    marginLeft: theme.spacing.md,
   },
   loadingContainer: {
     flex: 1,
@@ -149,16 +187,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   loadingText: {
-    fontSize: 16,
+    fontSize: theme.typography.sizes.md,
     color: theme.colors.textSecondary,
   },
   emptyContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    gap: theme.spacing.md,
   },
   emptyText: {
-    fontSize: 16,
+    fontSize: theme.typography.sizes.md,
     color: theme.colors.textSecondary,
+    textAlign: 'center',
   },
 }); 
