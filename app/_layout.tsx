@@ -1,8 +1,22 @@
-import React from "react";
-import {Stack} from "expo-router";
+import { Stack } from 'expo-router';
+import { StyleSheet } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
-const _layout = () => {
-    return <Stack screenOptions={{headerShown: false}}></Stack>;
-};
+export default function Layout() {
+  return (
+    <GestureHandlerRootView style={styles.container}>
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="index" />
+        <Stack.Screen name="register" />
+        <Stack.Screen name="home" />
+        <Stack.Screen name="transfer" />
+      </Stack>
+    </GestureHandlerRootView>
+  );
+}
 
-export default _layout;
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+});

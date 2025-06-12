@@ -1,7 +1,9 @@
-import React, {useEffect} from "react";
-import {Image, View, StyleSheet} from "react-native";
-import {colors} from "@/constants/theme";
-import {useRouter} from "expo-router";
+import { colors } from "@/constants/theme";
+import { useRouter } from "expo-router";
+import React, { useEffect } from "react";
+import { Image, StyleSheet, View } from "react-native";
+import { LoginScreen } from '../components/auth/LoginScreen';
+import { authService } from "../utils/authService";
 
 const Index = () => {
     const router = useRouter();
@@ -17,7 +19,26 @@ const Index = () => {
     );
 };
 
-export default Index;
+export default function Login() {
+    const router = useRouter();
+
+    return (
+        <LoginScreen
+            onLogin={async (email, password) => {
+                await authService.login(email, password).then((authenticated) => {
+                    if (authenticated) {
+                        router.replace('/home');
+                    } else {
+                        throw new Error('Credenciales inválidas');
+                    }
+                });
+            }}
+            onRegister={() => {
+                router.push('/register');
+            }}
+        />
+    );
+}
 
 const styles = StyleSheet.create({
     container: {
