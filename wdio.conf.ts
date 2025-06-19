@@ -6,7 +6,7 @@ export const config: WebdriverIO.Config = {
     maxInstances: 1,
     capabilities: [{
         platformName: 'Android',
-        'appium:app': './build-1749736804224.apk',
+        'appium:app': './build-1750308716706.apk',
         'appium:deviceName': 'Android',
         'appium:platformVersion': '16',
         'appium:automationName': 'UiAutomator2',
@@ -26,6 +26,7 @@ export const config: WebdriverIO.Config = {
     reporters: ['spec'],
     mochaOpts: {
         ui: 'bdd',
-        timeout: 60000
+        timeout: 60000,
+        cleanReferencesAfterRun: false
     }
 }
