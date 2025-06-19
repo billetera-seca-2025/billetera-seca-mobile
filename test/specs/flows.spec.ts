@@ -307,9 +307,9 @@ describe('Transfer Tests', () => {
     });
 
     it('should does not transfer with a wrong amount', async () => {
-        const [amountInput] = await Promise.all([browser.$('~transfer-amount')]);
-        await amountInput.waitForDisplayed({ timeout: TIMEOUT });
-        await amountInput.setValue('-1000');
+        const [wrongAmountInput] = await Promise.all([browser.$('~transfer-amount')]);
+        await wrongAmountInput.waitForDisplayed({ timeout: TIMEOUT });
+        await wrongAmountInput.setValue('-1000');
 
         const [destinationInput] = await Promise.all([browser.$('~transfer-destination')]);
         await destinationInput.waitForDisplayed({ timeout: TIMEOUT });
@@ -320,6 +320,28 @@ describe('Transfer Tests', () => {
         const [errorMessage] = await Promise.all([browser.$('~error-message')]);
         await errorMessage.waitForDisplayed({ timeout: TIMEOUT });
         expect(await errorMessage.getText()).toContain('Por favor ingresa un monto válido');
+    });
+
+    it('should does transfer with a correct email', async () => {
+        const [correctAmountInput] = await Promise.all([browser.$('~transfer-amount')]);
+        await correctAmountInput.waitForDisplayed({ timeout: TIMEOUT });
+        await correctAmountInput.setValue('1000');
+
+        const [destinationInput] = await Promise.all([browser.$('~transfer-destination')]);
+        await destinationInput.waitForDisplayed({ timeout: TIMEOUT });
+        await destinationInput.setValue('test1@example.com');
+
+        await clickTransferButton();
+
+        const [successModalTitle] = await Promise.all([browser.$('~success-modal-title')]);
+        await successModalTitle.waitForDisplayed({ timeout: TIMEOUT });
+        expect(await successModalTitle.getText()).toBe('¡Transferencia exitosa!');
+
+        await goToByActions(browser, "success-modal-close-button");
+
+        const [balanceAmount] = await Promise.all([browser.$('~balance-amount')]);
+        await balanceAmount.waitForDisplayed({ timeout: TIMEOUT });
+        expect(await balanceAmount.getText()).toBe('$51.000');
     });
 
     async function clickTransferButton() {
