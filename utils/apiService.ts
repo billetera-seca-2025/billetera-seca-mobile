@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BASE_URL = 'https://c491-186-136-2-160.ngrok-free.app';
+const BASE_URL = 'https://warm-eternal-goblin.ngrok-free.app';
 
 console.log('API Base URL:', BASE_URL);
 

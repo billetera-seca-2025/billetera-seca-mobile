@@ -6,7 +6,7 @@ export const config: WebdriverIO.Config = {
     maxInstances: 1,
     capabilities: [{
         platformName: 'Android',
-        'appium:app': './build-1750308716706.apk',
+        'appium:app': './build-1750353241014.apk',
         'appium:deviceName': 'Android',
         'appium:platformVersion': '16',
         'appium:automationName': 'UiAutomator2',
